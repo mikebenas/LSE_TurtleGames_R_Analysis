@@ -52,24 +52,39 @@
 
 # 1. Load and explore the data
 
-# Install and import Tidyverse.
+# Install needed libraries
+library(ggplot2)     
+library(tidyverse)
 
-
-# Import the data set.
-
+# Get working directory.
+getwd()
+# Import the data set .
+tsales <- read.csv('Z:/DataAnalytics/MikeGit/LSE_TurtleGames_R_Analysis/turtle_sales.csv', header=TRUE)
 
 # Print the data frame.
+View(tsales)
+str(tsales)
+summary(tsales)
 
+
+# Check for NA 
+is.na(tsales)
+apply(is.na(tsales), 2, which)
+#(Column Year which contains the NA will be removed in following step)
+
+#Check for duplicates 
+tsales[duplicated(tsales) | duplicated(tsales, fromLast=TRUE), ]
+#Found 0 duplicates
 
 # Create a new data frame from a subset of the sales data frame.
 # Remove unnecessary columns. 
-
+tsales2 <- select(tsales, -Ranking, -Year, -Genre, -Publisher)
 
 # View the data frame.
-
+View(tsales2)
 
 # View the descriptive statistics.
-
+summary(tsales2)
 
 ################################################################################
 
@@ -77,19 +92,89 @@
 
 ## 2a) Scatterplots
 # Create scatterplots.
+# Qplot scatterplots for NA, EU, and Global.
+#Qplot for NA
+qplot(Product, NA_Sales, colour=Platform, data=tsales2, geom=c('point', 'jitter'))+
+  labs(title= "Relationship between product and NA sales",
+       subtitle="Sales by Platform",
+        x="Products",
+       y="NA Sales") 
+  
+#Qplot for EU
+qplot(Product, EU_Sales, colour=Platform, data=tsales2, geom=c('point', 'jitter'))+
+labs(title= "Relationship between product and EU sales",
+       subtitle="Sales by Platform",
+       x="Products",
+       y="EU Sales") 
 
+  #Qplot for Global
+  qplot(Product, Global_Sales, colour=Platform, data=tsales2, geom=c('point', 'jitter'))+
+  labs(title= "Relationship between product and Global Sales",
+       subtitle="Sales by Platform",
+        x="Products",
+       y="Global Sales") 
 
 ## 2b) Histograms
 # Create histograms.
 
+plot(hist(tsales2$NA_Sales))
+plot(hist(tsales2$EU_Sales))
+plot(hist(tsales2$Global_Sales))
 
 ## 2c) Boxplots
 # Create boxplots.
+qplot(Product, NA_Sales, colour=Platform, data=tsales2,
+        geom='boxplot')+
+        labs(title= "Boxplot of products and NA sales by Platform",
+        subtitle="Products by NA Sales",
+        x="Products",
+        y="NA Sales")
+  
+qplot(Product, EU_Sales, colour=Platform, data=turtle_sales2,
+        geom='boxplot')+
+        labs(title= "Boxplot of products and EU sales by Platform",
+        subtitle="Products by EU Sales",
+        x="Products",
+        y="EU Sales") 
 
+qplot(Product, Global_Sales, colour=Platform, data=turtle_sales2,
+        geom='boxplot')+
+        labs(title= "Boxplot of products and global sales by Platform",
+        subtitle="Products by Global Sales",
+        x="Products",
+        y="Global Sales") 
 
+ 
 ###############################################################################
 
 # 3. Observations and insights
+
+# Relationship between partial sales and global sales.
+# Skewness:
+
+# Install the moments package and load the library.
+install.packages('moments') 
+library(moments)
+
+skewness(tsales2$NA_Sales)
+skewness(tsales2$EU_Sales)
+skewness(tsales2$Global_Sales)
+# All skewed to the right or positively skewed.
+
+# Checking for outliers NA_Sales
+install.packages('EnvStats')
+library(EnvStats)
+out1 <- rosnerTest(tsales2$NA_Sales,k = 10)
+out1
+
+out2 <- rosnerTest(tsales2$EU_Sales,k = 10)
+out2
+
+out3 <- rosnerTest(tsales2$Global_Sales,k = 10)
+out3
+
+# As per previous clustering done on the set above results are not outliers 
+# but valid data points representing group of high sales
 
 ## Your observations and insights here ......
 
@@ -296,6 +381,7 @@
 
 ###############################################################################
 ###############################################################################
+
 
 
 
